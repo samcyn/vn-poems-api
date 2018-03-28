@@ -65,7 +65,22 @@ app.get('/poems/:poemId', (req, res) => {
 
 });
 
-
+app.delete('/poems/:poemId', (req, res) => {
+  var id = req.params.poemId;
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send()
+  }
+  Poem.findOneAndRemove({
+    _id: id
+  }).then((poem) => {
+    if(!poem){
+      return res.status(404).send()
+    }
+    res.send({poem});
+  }).catch((e) => {
+    res.status(400).send(e)
+  });
+});
 
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
