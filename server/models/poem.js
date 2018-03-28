@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var Poem = mongoose.model('Poem', {
+var PoemSchema = new mongoose.Schema({
   title : {
     type: String,
     required: true,
@@ -14,6 +14,9 @@ var Poem = mongoose.model('Poem', {
     trim: true
   },
   createdAt: {
+    type: Date
+  },
+  updatedAt: {
     type: Number,
     default: null
   },
@@ -42,5 +45,13 @@ var Poem = mongoose.model('Poem', {
 
 });
 
+//before saving new instances updated the createdAt value
+PoemSchema.pre('save', function(next) {
+  var poem = this;
+  poem.createdAt = Date.now();
+  next();
+});
+
+var Poem = mongoose.model('Poem', PoemSchema);
 
 module.exports = { Poem };
