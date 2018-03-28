@@ -26,6 +26,7 @@ app.post('/poems', (req, res) => {
   var poem = new Poem({
     title: req.body.title,
     message: req.body.message,
+    location: req.body.location,
     author: new ObjectID()
   });
 
@@ -34,7 +35,17 @@ app.post('/poems', (req, res) => {
   }, (e) => {
     res.status(400).send(e);
   });
+
 });
+
+app.get('/poems', (req, res) => {
+  Poem.find({}).then((poems) => {
+    res.send({poems})
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
 
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
