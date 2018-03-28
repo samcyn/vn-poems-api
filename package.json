@@ -1,0 +1,25 @@
+{
+  "name": "vn-poems",
+  "version": "1.0.0",
+  "description": "API for posting, reading, and sharing poems. ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samcyn/vn-poems-api.git"
+  },
+  "keywords": [
+    "poems",
+    "fun",
+    "words",
+    "creative"
+  ],
+  "author": "Samson Iyanda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/samcyn/vn-poems-api/issues"
+  },
+  "homepage": "https://github.com/samcyn/vn-poems-api#readme"
+}
