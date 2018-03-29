@@ -22,6 +22,7 @@ const port = process.env.PORT;
 //middleware bodyParser.json() evaluates to a function
 app.use(bodyParser.json());
 
+// POST A NEW POEM
 app.post('/poems', (req, res) => {
   var newPoem = new Poem({
     title: req.body.title,
@@ -38,6 +39,7 @@ app.post('/poems', (req, res) => {
 
 });
 
+// GET ALL POEMS 
 app.get('/poems', (req, res) => {
   Poem.find({}).then((poems) => {
     res.send({poems})
@@ -46,7 +48,7 @@ app.get('/poems', (req, res) => {
   });
 });
 
-
+//GET POEMS BY ID
 app.get('/poems/:poemId', (req, res) => {
   var id = req.params.poemId;
   if(!ObjectID.isValid(id)){
@@ -65,6 +67,7 @@ app.get('/poems/:poemId', (req, res) => {
 
 });
 
+// POST RESPONSES
 app.post('/poems/:poemId', (req, res) => {
   var id = req.params.poemId;
   var readerId = req.body.readerId || new ObjectID();
@@ -90,7 +93,7 @@ app.post('/poems/:poemId', (req, res) => {
 
 });
 
-
+//DELETE POEM BY ID
 app.delete('/poems/:poemId', (req, res) => {
   var id = req.params.poemId;
   if(!ObjectID.isValid(id)){

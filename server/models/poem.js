@@ -67,7 +67,13 @@ PoemSchema.methods.addNewResponse = function(arg){
 //before saving new instances updated the createdAt value
 PoemSchema.pre('save', function(next) {
   var poem = this;
-  poem.createdAt = Date.now();
+
+  if(poem.isModified('stats.responses')){
+    console.log('Yes')
+  } else{
+    poem.createdAt = Date.now();
+  }
+ 
   next();
 });
 
