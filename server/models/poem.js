@@ -68,7 +68,7 @@ PoemSchema.methods.addNewResponse = function(arg){
 PoemSchema.pre('save', function(next) {
   var poem = this;
 
-  if(poem.isModified('stats.responses')){
+  if(poem.isModified('stats.responses') || poem.isModified('stats.likes')){
     console.log('Yes')
   } else{
     poem.createdAt = Date.now();

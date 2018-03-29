@@ -67,30 +67,39 @@ app.get('/poems/:poemId', (req, res) => {
 
 });
 
-// POST RESPONSES
-app.post('/poems/:poemId', (req, res) => {
-  var id = req.params.poemId;
-  var readerId = req.body.readerId || new ObjectID();
-  var response = req.body.response;
-  var createdAt = Date.now();
-  var comment = { readerId, response, createdAt };
+// UPDATE POEM 
+app.patch('/poems/:poemId', async (req, res) => {
+  let id = req.params.poemId;
+  let updates = req.body;
+
   if(!ObjectID.isValid(id)){
     return res.status(404).send()
   }
-  Poem.findOne({
-    _id: id
-  }).then((poem) => {
-    if(!poem){
-      return res.status(404).send()
-    }
-    poem.addNewResponse(comment).then((newComment) => {
+  //IF REQ.BODY HAS RESPONSE, DEFINITELY YOU WANNA ADD RESPONSE
+  if(updates.response){
+    try{
+      updates.createdAt = Date.now();
+      const poem = await Poem.findOne({ _id: id});
+      const response = await poem.addNewResponse(updates);
       res.send({poem});
-    });
-    
-  }).catch((e) => {
-    res.status(400).send(e)
-  });
-
+    } catch (e){
+      res.status(400).send(e)
+    }
+  }
+  else{
+    try{
+      updates.updatedAt = Date.now();
+      const poem = await Poem.findOneAndUpdate({ 
+        _id: id,
+        author: updates.author //authenticate update here...
+      }, {$set: updates }, { new: true });
+     
+      res.send({poem});
+    } catch (e){
+      res.status(400).send(e)
+    }
+  }
+  
 });
 
 //DELETE POEM BY ID
