@@ -52,9 +52,9 @@ app.get('/poems/:poemId', (req, res) => {
   if(!ObjectID.isValid(id)){
     return res.status(404).send()
   }
-  Poem.findOne({
+  Poem.findOneAndUpdate({
     _id: id
-  }).then((poem) => {
+  }, { $inc: { "stats.views" : 1 } }).then((poem) => {
     if(!poem){
       return res.status(404).send()
     }
@@ -64,6 +64,32 @@ app.get('/poems/:poemId', (req, res) => {
   });
 
 });
+
+app.post('/poems/:poemId', (req, res) => {
+  var id = req.params.poemId;
+  var readerId = req.body.readerId || new ObjectID();
+  var response = req.body.response;
+  var createdAt = Date.now();
+  var comment = { readerId, response, createdAt };
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send()
+  }
+  Poem.findOne({
+    _id: id
+  }).then((poem) => {
+    if(!poem){
+      return res.status(404).send()
+    }
+    poem.addNewResponse(comment).then((newComment) => {
+      res.send({poem});
+    });
+    
+  }).catch((e) => {
+    res.status(400).send(e)
+  });
+
+});
+
 
 app.delete('/poems/:poemId', (req, res) => {
   var id = req.params.poemId;

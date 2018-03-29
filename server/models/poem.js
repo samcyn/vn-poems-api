@@ -29,11 +29,11 @@ var PoemSchema = new mongoose.Schema({
     required: true
   },
   stats: {
-    reponses: [{
+    responses: [{
       readerId: {
         type: mongoose.Schema.Types.ObjectId,
       },
-      message: {
+      response: {
         type: String
       },
       createdAt: {
@@ -52,6 +52,17 @@ var PoemSchema = new mongoose.Schema({
   }
 
 });
+
+//instance methods here..
+PoemSchema.methods.addNewResponse = function(arg){
+  const poem = this;
+  
+  poem.stats.responses = poem.stats.responses.concat([arg]);
+  
+  return poem.save().then(() => {
+    return arg;
+  });
+};
 
 //before saving new instances updated the createdAt value
 PoemSchema.pre('save', function(next) {
