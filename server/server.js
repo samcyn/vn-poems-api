@@ -11,7 +11,7 @@ const { Poem } = require('./models/poem');
 
 const { User } = require('./models/user');
 
-const { Comment } = require('./models/comment');
+const { Response } = require('./models/response');
 
 // const { authenticate } = require('./middleware/authenticate');
 
@@ -28,7 +28,7 @@ app.post('/poems', (req, res) => {
     title: req.body.title,
     message: req.body.message,
     location: req.body.location,
-    author: new ObjectID()
+    authorId: new ObjectID()
   });
 
   newPoem.save().then((poem) => {
@@ -79,6 +79,8 @@ app.patch('/poems/:poemId', async (req, res) => {
   if(updates.response){
     try{
       updates.createdAt = Date.now();
+      updates.readerId = new ObjectID(); //authenticated id of user
+      updates.poemId = id;
       const poem = await Poem.findOne({ _id: id});
       const response = await poem.addNewResponse(updates);
       res.send({poem});
@@ -86,12 +88,13 @@ app.patch('/poems/:poemId', async (req, res) => {
       res.status(400).send(e)
     }
   }
+  // ELSE YOU WANNA TRY SOMETHING ELSE LIKE EDITING POEM TITLE OR SO
   else{
     try{
       updates.updatedAt = Date.now();
       const poem = await Poem.findOneAndUpdate({ 
         _id: id,
-        author: updates.author //authenticate update here...
+        authorId: updates.authorId //authenticate update here...
       }, {$set: updates }, { new: true });
      
       res.send({poem});

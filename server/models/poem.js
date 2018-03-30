@@ -20,7 +20,7 @@ var PoemSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
-  author:{
+  authorId:{
     type: mongoose.Schema.Types.ObjectId,
     required: true
   },
@@ -33,6 +33,9 @@ var PoemSchema = new mongoose.Schema({
       readerId: {
         type: mongoose.Schema.Types.ObjectId,
       },
+      poemId: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
       response: {
         type: String
       },
@@ -42,8 +45,7 @@ var PoemSchema = new mongoose.Schema({
       }
     }],
     likes: {
-      type: Number,
-      default: 0
+      type: Array
     },
     views: {
       type: Number,
@@ -58,7 +60,7 @@ PoemSchema.methods.addNewResponse = function(arg){
   const poem = this;
   
   poem.stats.responses = poem.stats.responses.concat([arg]);
-  
+
   return poem.save().then(() => {
     return arg;
   });
@@ -68,8 +70,8 @@ PoemSchema.methods.addNewResponse = function(arg){
 PoemSchema.pre('save', function(next) {
   var poem = this;
 
-  if(poem.isModified('stats.responses') || poem.isModified('stats.likes')){
-    console.log('Yes')
+  if(poem.isModified('stats.responses') || poem.isModified('stats.likes') || poem.isModified('stats.views')){
+    console.log('Yes');
   } else{
     poem.createdAt = Date.now();
   }
