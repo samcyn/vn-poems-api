@@ -21,6 +21,9 @@ var UserSchema = new mongoose.Schema({
     required: true,
     minLength: 6
   },
+  createdAt: {
+    type: Date
+  },
   tokens: [{
     access: {
       type: String,
@@ -30,14 +33,35 @@ var UserSchema = new mongoose.Schema({
       type: String,
       required: true
     }
-  }]
+  }],
+  profile: {
+    userName: {
+      type: String,
+      minLength:1
+    },
+    profilePic: {
+      type: Object
+    }
+  },
+  stats: {
+    poemList:[]//,//Array of user poems
+    // totalLikes: {
+    //   type: Number,
+    //   default: 0
+    // },
+    // totalViews: {
+    //   type: Number,
+    //   default: 0
+    // },
+  }
 });
 
 
 UserSchema.methods.toJSON = function(){
   var user = this;
   var userObject = user.toObject();
-  return _.pick(userObject, ['_id', 'email']);
+  // return _.pick(userObject, ['_id', 'email']);
+  return user;
 };
 
 //instance methods here..
@@ -121,4 +145,4 @@ UserSchema.pre('save', function(next){
 
 var User = mongoose.model('User', UserSchema);
 
-module.exports = { User }
+module.exports = { User };
