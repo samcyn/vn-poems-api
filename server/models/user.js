@@ -34,7 +34,7 @@ var UserSchema = new mongoose.Schema({
       required: true
     }
   }],
-  profile: {
+  profile: [{
     userName: {
       type: String,
       minLength:1
@@ -42,7 +42,7 @@ var UserSchema = new mongoose.Schema({
     profilePic: {
       type: Object
     }
-  },
+  }],
   stats: {
     poemList:[]//,//Array of user poems
     // totalLikes: {
@@ -130,6 +130,7 @@ UserSchema.statics.findByCredentials = function(email, password){
 //moogoose middleware used before saving doc
 UserSchema.pre('save', function(next){
   var user = this;
+  user.createdAt = Date.now();
   //we only wanna encrpt password if password is modified..
   if(user.isModified('password')){
     bcrypt.genSalt(10, (err, salt) => {
