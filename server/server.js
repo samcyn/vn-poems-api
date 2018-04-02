@@ -13,7 +13,7 @@ const { User } = require('./models/user');
 
 const { Response } = require('./models/response');
 
-// const { authenticate } = require('./middleware/authenticate');
+const { authenticate } = require('./middleware/authenticate');
 
 const  app = express();
 
