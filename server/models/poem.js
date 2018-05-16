@@ -1,6 +1,8 @@
-var mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-var PoemSchema = new mongoose.Schema({
+const { Schema } = mongoose;
+
+const PoemSchema = new Schema({
   title : {
     type: String,
     required: true,
@@ -79,6 +81,6 @@ PoemSchema.pre('save', function(next) {
   next();
 });
 
-var Poem = mongoose.model('Poem', PoemSchema);
+const Poem = mongoose.model('Poem', PoemSchema);
 
-module.exports = { Poem };
+export default Poem;

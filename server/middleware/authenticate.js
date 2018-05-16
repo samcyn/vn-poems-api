@@ -1,21 +1,22 @@
-var { User } = require ('./../models/user');
+import db from './../models';
 
-
-var authenticate = (req, res, next) => {
+const authenticate = (req, res, next) => {
   var token = req.header('x-auth');
-  
+
   //MODEL METHOD CALLED
-  User.findByToken(token).then((user) => {
+  db.User.findByToken(token).then((user) => {
     if(!user){
-      return Promise.reject();
+      return Promise.reject({ message: "Unauthorized request "});
     }
     // res.send(user);
     req.user = user;
     req.token = token;
     next();
-  }).catch((e) => {
-    res.status(401).send();
+  }).catch((err) => {
+    res.status(401).json({
+      message: err.message
+    }); 
   });
 }; 
 
-module.exports = { authenticate };
+export default authenticate;

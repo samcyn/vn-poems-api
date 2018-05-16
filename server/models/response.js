@@ -1,6 +1,8 @@
-var mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-var ResponseSchema = new mongoose.Schema({
+const { Schema } = mongoose;
+
+var ResponseSchema = Schema({
   
   readerId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +42,6 @@ ResponseSchema.pre('save', function(next) {
   next();
 });
 
-var Response = mongoose.model('response', ResponseSchema);
+const Response = mongoose.model('Response', ResponseSchema);
 
-module.exports = { Response };
+export default Response;
