@@ -5,9 +5,9 @@ const userController = {};
 
 userController.post = async (req, res) => {
   try{
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
   
-    const user = new db.User({ email, password });
+    const user = new db.User({ username, email, password });
    
     const newUser = await user.save();
     const token = await user.generateAuthToken();

@@ -16,45 +16,23 @@ const PoemSchema = new Schema({
     trim: true
   },
   createdAt: {
-    type: Date
+    type: Date,
+    default: Date.now()
   },
   updatedAt: {
     type: Number,
     default: null
   },
-  authorId:{
-    type: mongoose.Schema.Types.ObjectId,
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  _creator:{
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
-  location:{
-    type: String,
-    required: true
-  },
-  stats: {
-    responses: [{
-      readerId: {
-        type: mongoose.Schema.Types.ObjectId,
-      },
-      poemId: {
-        type: mongoose.Schema.Types.ObjectId,
-      },
-      response: {
-        type: String
-      },
-      createdAt: {
-        type: Number,
-        default: null
-      }
-    }],
-    likes: {
-      type: Array
-    },
-    views: {
-      type: Number,
-      default: 0
-    }
-  }
-
+  _comments : [{ type: Schema.Types.ObjectId, ref: 'Comment'}]
 });
 
 //instance methods here..
@@ -68,18 +46,7 @@ PoemSchema.methods.addNewResponse = function(arg){
   });
 };
 
-//before saving new instances updated the createdAt value
-PoemSchema.pre('save', function(next) {
-  var poem = this;
 
-  if(poem.isModified('stats.responses') || poem.isModified('stats.likes') || poem.isModified('stats.views')){
-    console.log('Yes');
-  } else{
-    poem.createdAt = Date.now();
-  }
- 
-  next();
-});
 
 const Poem = mongoose.model('Poem', PoemSchema);
 

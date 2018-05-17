@@ -7,6 +7,8 @@ import authenticate from './middleware/authenticate';
 import basicController from './controllers/basicController';
 import userController from './controllers/userController';
 import poemController from './controllers/poemController';
+import commentController from './controllers/commentController';
+
 
 
 const routes = express();
@@ -22,11 +24,15 @@ routes.delete('/users/me/token', authenticate, userController.delete);
 routes.patch('/users/me', authenticate, userController.patch);
 
 // Poem Routes..
-routes.post('/poems', poemController.post);
+routes.post('/poems', authenticate, poemController.post);
 routes.get('/poems', poemController.getAll);
 routes.get('/poems/:poemId', poemController.getOne);
-routes.patch('/poems/:poemId', poemController.patch);
-routes.delete('/poems/:poemId', poemController.delete);
+routes.patch('/poems/:poemId', authenticate, poemController.patch);
+routes.delete('/poems/:poemId', authenticate, poemController.delete);
+
+// Comment Routes
+routes.post('/comment', authenticate, commentController.post);
+
 
 
 export default routes;

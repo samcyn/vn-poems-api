@@ -1,9 +1,9 @@
 import Poem from './poem';
-import Response from './response';
+import Comment from './comment';
 import User from './user';
 
 export default {
   User,
-  Response,
+  Comment,
   Poem
 }

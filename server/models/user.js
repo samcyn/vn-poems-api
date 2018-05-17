@@ -13,7 +13,9 @@ const LOCK_TIME = 2 * 60 * 60 * 1000;
 
 var UserSchema = new Schema({
   username: {
-    type: String
+    type: String,
+    unique: true,
+    required: true
   },
   email: {
     type: String,
@@ -49,7 +51,11 @@ var UserSchema = new Schema({
     type: Object
   },
   loginAttempts: { type: Number, required: true, default: 0 },
-  lockUntil: { type: Number }
+  lockUntil: { type: Number },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
 });
 
 
