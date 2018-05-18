@@ -1,5 +1,4 @@
 import db from './../models';
-import { ObjectID } from 'mongodb';
 
 const commentController = {};
 

@@ -157,10 +157,8 @@ UserSchema.statics.findByCredentials = function(email, password){
 
 UserSchema.statics.updateUsersCredentials = function (_id, updates){
   var User = this;
-  console.log(updates);
-  return User.findByIdAndUpdate({ _id }, { $set: {
-    ...updates
-  }}).then(function(user){
+  return User.findByIdAndUpdate({ _id }, { $set: updates
+  }, { new: true }).then(function(user){
     return user.save();
   });
 }

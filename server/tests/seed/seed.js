@@ -1,8 +1,6 @@
-const { ObjectID } = require('mongodb');
-const jwt = require('jsonwebtoken');
-
-const { Todo } = require('./../../models/todo');
-const { User} = require('./../../models/user');
+import { ObjectID } from 'mongodb';
+import jwt from 'jsonwebtoken';
+import db from '../../models';
 
 // seed data...
 const userOneId = new ObjectID();
@@ -10,6 +8,7 @@ const userTwoId = new ObjectID();
 
 const users = [{
   _id: userOneId,
+  username: "Samcyn",
   email: 'andrew@example.com',
   password: 'userOnePass',
   tokens: [{
@@ -18,6 +17,7 @@ const users = [{
   }]
 }, {
   _id: userTwoId,
+  username: "jide",
   email: 'jen@example.com',
   password: 'userTwoPass',
   tokens: [{
@@ -26,32 +26,34 @@ const users = [{
   }]
 }];
 
-const todos = [{
+const poems = [{
   _id: new ObjectID(),
-  text: 'First test todo',
+  title: 'First test poem',
+  message: "Message for first poem",
   _creator: userOneId
 }, {
   _id: new ObjectID(),
-  text: 'Second test todo',
-  completed: true,
-  completedAt: 333,
+  title: 'Second test poem',
+  message: "Message for first poem",
   _creator: userTwoId
 }];
 
 
-const populateTodos = (done) => {
-  Todo.remove({}).then(() => {
-    return Todo.insertMany(todos);
-  }).then(() => done());
+const populatePoems = () => {
+  return db.Poem.remove({}).then(() => {
+    return db.Poem.insertMany(poems);
+  })
 };
 
-const populateUsers = (done) => {
-  User.remove({}).then(() => {
-    var userOne = new User(users[0]).save();
-    var userTwo = new User(users[1]).save();
+const populateUsers = () => {
+  return db.User.remove({}).then(() => {
+    var userOne = new db.User(users[0]).save();
+    var userTwo = new db.User(users[1]).save();
 
     return Promise.all([userOne, userTwo])
-  }).then(() => done());
+  })
 }
 
-module.exports = { todos, populateTodos, users, populateUsers };
+export {
+  poems, populatePoems, users, populateUsers
+}
