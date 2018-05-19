@@ -105,114 +105,43 @@ describe('GET /api/poems/:id', () => {
 
 });
 
-
-// describe('DELETE /poems/:id', () => {
-//   it('should remove a todo', (done) => {
-//     var hexId = poems[1]._id.toHexString()
-//     request(app)
-//       .delete(`/poems/${hexId}`)
-//       .set('x-auth', users[1].tokens[0].token)            
-//       .expect(200)
-//       .expect((res) => {
-//         expect(res.body.todo._id).toBe(hexId)
-//       })
-//       .end((err, res) => {
-//         if(err){
-//           return done(err);
-//         }
-//         Todo.findById(hexId).then((todo) => {
-//           expect(todo).toBeFalsy();
-//           done();
-//         }).catch((e) => done(e));
-//       });
-
-// });
-
-//   it('should remove a todo', (done) => {
-//     var hexId = poems[0]._id.toHexString()
-//     request(app)
-//       .delete(`/poems/${hexId}`)
-//       .set('x-auth', users[1].tokens[0].token)            
-//       .expect(404)
-//       .end((err, res) => {
-//         if(err){
-//           return done(err);
-//         }
-//         Todo.findById(hexId).then((todo) => {
-//           expect(todo).toBeTruthy();
-//           done();
-//         }).catch((e) => done(e));
-//       });
-
-//   });
-
-//   it('should return 404 if todo not found', (done) => {
-//     var hexId = new ObjectID()
-//     request(app)
-//       .delete(`/poems/${hexId.toHexString()}`)
-//       .set('x-auth', users[1].tokens[0].token)                  
-//       .expect(404)
-//       .end(done);
-//   });
-
-//   it('should return 404 if object id is invalid', (done) => {
-//     request(app)
-//       .delete('/poems/1234')
-//       .set('x-auth', users[1].tokens[0].token)                  
-//       .expect(404)
-//       .end(done);
-//   })
-// });
-
-// describe('PATCH /poems/:id', () => {
-//   it('should update the todo', (done) => {
-//     var hexId = poems[0]._id.toHexString();
-//     var title = "test updates";
-
-//     request(app)
-//       .patch(`/poems/${hexId}`)
-//       .set('x-auth', users[0].tokens[0].token)
-//       .send({title, completed: true})
-//       .expect(200)
-//       .expect((res) => {
-//         expect(res.body.todo.title).toBe(title);
-//         expect(res.body.todo.completed).toBe(true);
-//         expect(typeof(res.body.todo.completedAt)).toBe('number');
-//       })
-//       .end(done);
-//   });
-
-//   it('should not update the todo created by other user', (done) => {
-//     var hexId = poems[0]._id.toHexString();
-//     var title = "test updates";
-
-//     request(app)
-//       .patch(`/poems/${hexId}`)
-//       .set('x-auth', users[1].tokens[0].token)
-//       .send({title, completed: true})
-//       .expect(404)
-//       .end(done);
-//   });
-
-//   it('should clear completedAt when todo is not comleted', (done) => {
-//     var hexId = poems[1]._id.toHexString();
-//     var title = "test updates !!";
-
-//     request(app)
-//       .patch(`/poems/${hexId}`)
-//       .set('x-auth', users[1].tokens[0].token)      
-//       .send({title, completed: false})
-//       .expect(200)
-//       .expect((res) => {
-//         expect(res.body.todo.title).toBe(title);
-//         expect(res.body.todo.completed).toBe(false);
-//         expect(res.body.todo.completedAt).toBeFalsy();
-//       })
-//       .end(done);
-//   });
-// });
-
-
+describe('DELETE /poems/:id', () => {
+  it('should remove a poem token', (done) => {
+    var hexId = poems[1]._id.toHexString()
+    request(app)
+      .delete(`/api/poems/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token)            
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.data._id).toBe(hexId)
+      })
+      .end((err, res) => {
+        if(err){
+          return done(err);
+        }
+        db.Poem.findById(hexId).then((poem) => {
+          expect(poem).toBeFalsy();
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+  it('should return 404 if poem not found', (done) => {
+    var hexId = new ObjectID()
+    request(app)
+      .delete(`/api/poems/${hexId.toHexString()}`)
+      .set('x-auth', users[1].tokens[0].token)                  
+      .expect(404)
+      .end(done);
+  });
+    
+  it('should return 404 if object id is invalid', (done) => {
+    request(app)
+      .delete('/poems/1234')
+      .set('x-auth', users[1].tokens[0].token)                  
+      .expect(404)
+      .end(done);
+  })
+});
 
 describe('GET /users/me', () => {
   it('should return user if authenticated', (done) => {
@@ -239,6 +168,56 @@ describe('GET /users/me', () => {
   });
 
 });
+
+// describe('PATCH /poems/:id', () => {
+//   it('should update the poem', (done) => {
+//     var hexId = poems[0]._id.toHexString();
+//     var title = "test updates";
+
+//     request(app)
+//       .patch(`/poems/${hexId}`)
+//       .set('x-auth', users[0].tokens[0].token)
+//       .send({title, completed: true})
+//       .expect(200)
+//       .expect((res) => {
+//         expect(res.body.poem.title).toBe(title);
+//         expect(res.body.poem.completed).toBe(true);
+//         expect(typeof(res.body.poem.completedAt)).toBe('number');
+//       })
+//       .end(done);
+//   });
+
+//   it('should not update the poem created by other user', (done) => {
+//     var hexId = poems[0]._id.toHexString();
+//     var title = "test updates";
+
+//     request(app)
+//       .patch(`/poems/${hexId}`)
+//       .set('x-auth', users[1].tokens[0].token)
+//       .send({title, completed: true})
+//       .expect(404)
+//       .end(done);
+//   });
+
+//   it('should clear completedAt when poem is not comleted', (done) => {
+//     var hexId = poems[1]._id.toHexString();
+//     var title = "test updates !!";
+
+//     request(app)
+//       .patch(`/poems/${hexId}`)
+//       .set('x-auth', users[1].tokens[0].token)      
+//       .send({title, completed: false})
+//       .expect(200)
+//       .expect((res) => {
+//         expect(res.body.poem.title).toBe(title);
+//         expect(res.body.poem.completed).toBe(false);
+//         expect(res.body.poem.completedAt).toBeFalsy();
+//       })
+//       .end(done);
+//   });
+// });
+
+
 
 // describe('POST /users', () => {
 //   it('should create a user', (done) => {
@@ -356,4 +335,4 @@ describe('GET /users/me', () => {
 //         }).catch((e) => done(e));
 //       });
 //   });
-// });
+

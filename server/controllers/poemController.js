@@ -15,11 +15,21 @@ poemController.post = (req, res) => {
   });
 
   poem.save().then((newPoem) => {
-    res.status(200).json({
-      success: true,
-      data: newPoem
-    });
-  }, (err) => {
+    if(newPoem){
+      const response = {
+        success: true,
+        poem: {
+          ...newPoem.toObject(),
+          request: {
+            type: 'GET',
+            description: 'GET poem using url',
+            url: `http://localhost:3000/api/poems/${newPoem._id}`
+          }
+        }
+      }
+      res.status(200).json(response);
+    }
+  }).catch( (err) => {
     res.status(400).json({
       message: err.message
     });
@@ -28,52 +38,77 @@ poemController.post = (req, res) => {
 }
 
 poemController.getAll = (req, res) => {
-  db.Poem.find({}).populate({
+  db.Poem.find({})
+  .select('_id title message _comments isDeleted updatedAt createdAt')
+  .populate({
     path: '_creator',
     select: 'username -_id'
   }).then((poems) => {
-    res.status(200).json({
+    const response = {
       success: true,
-      data: poems
-    })
-  }, (err) => {
+      count: poems.length,
+      poems: poems.map((poem) => {
+        return {
+          ...poem.toObject(),
+          request: {
+            type: 'GET',
+            description: 'GET poem using url',
+            url: `http://localhost:3000/api/poems/${poem._id}`
+          }
+        }
+      })
+    }
+    res.status(200).json(response);
+  }).catch((err) => {
     res.status(400).json({
       message: err
     });
-  });
+  })
 }
 
-poemController.getOne = (req, res) => {
+poemController.getOne = async (req, res) => {
 
   var id = req.params.poemId;
   if(!ObjectID.isValid(id)){
-    return res.status(404).json({
+    res.status(404).json({
       message: "no such poem"
     })
   }
-  db.Poem.findOne({ _id: id}).populate({
-    path: '_creator',
-    select: 'username -_id'
-  }).populate({
-    path: '_comments',
-    select: 'message _creator _poem createdAt',
-    match: { 'isDeleted' : false }
-  })
-  .then((poem) => {
+  try{
+    const poem = await db.Poem.findOne({ _id: id})
+    .populate({
+      path: '_creator',
+      select: 'username -_id' 
+    }).populate({
+      path: '_comments',
+      select: 'message _creator _poem _comments createdAt',
+      match: { 'isDeleted' : false }
+    });
+
     if(!poem){
       return res.status(404).json({
         message: "can't find poem"
       })
     }
-    res.status(200).json({
+    const response = {
       success: true,
-      data: poem
-    });
-  }).catch((err) => {
+      poem: {
+        ...poem.toObject(),
+        request: {
+          type: 'GET',
+          description: 'GET all poems',
+          url: 'http://localhost:3000/api/poems'
+        }
+      }
+    };
+
+    res.status(200).json(response);
+
+  } catch(err){
     res.status(400).json({
       message: err.message
     })
-  });
+  }
 }
 
 poemController.patch = async (req, res) => {
@@ -84,7 +119,7 @@ poemController.patch = async (req, res) => {
 
   if(!ObjectID.isValid(id)){
     return res.status(404).json({
-      message: "unauthorized access"
+      message: "No such poem"
     })
   }
   
@@ -95,16 +130,28 @@ poemController.patch = async (req, res) => {
       _creator: userId
     }, { $set: updates }, { new: true });
     
-    res.status(200).json({
-      success: true, 
-      data: poem
-    });
+    if(!poem){
+      res.status(404).json({
+        message: "Poem not found"
+      }) 
+    }
+    const response = {
+      success: true,
+      poem: {
+        ...poem.toObject(),
+        request: {
+          type: 'GET',
+          description: 'GET poem using url',
+          url: 'http://localhost:3000/api/poems' + id
+        }
+      }
+    }
+    res.status(200).json(response);
   } catch (err){
     res.status(400).json({
       message: err.message
     })
   }
-  
   
 }
 
@@ -126,10 +173,18 @@ poemController.delete = (req, res) => {
         message: "No such poem"
       });
     }
-    res.status(200).json({
+    const response  = {
       success: true,
-      data: poem
-    });
+      poem: {
+        ...poem.toObject(),
+        request: {
+          type: 'POST',
+          url: 'http://localhost:3000/api/poems',
+          data: { title: 'String', message: 'String', _creator: 'ObjectID'}
+        }
+      }
+    }
+    res.status(200).json(response);
   }).catch((err) => {
     res.status(400).json({
       message: err.message

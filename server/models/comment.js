@@ -23,7 +23,12 @@ var CommentSchema = Schema({
     type: Schema.Types.ObjectId,
     ref: 'Poem',
     required: true
-  }
+  },
+  _parentId: {
+    type: Schema.Types.ObjectId,
+    default: null
+  },
+  _comments : [{ type: Schema.Types.ObjectId, ref: 'Comment'}]  
 
 });
 
@@ -32,6 +37,11 @@ function autoPopulateUser(next){
   this.populate({
     path: '_creator',
     select: 'username -_id'
+  });
+  this.populate({
+    path: '_comments',
+    select: '_id message _creator _poem _comments _parentId createdAt',
+    match: { 'isDeleted' : false }
   });
   next();
 }

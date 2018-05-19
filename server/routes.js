@@ -32,6 +32,7 @@ routes.delete('/poems/:poemId', authenticate, poemController.delete);
 
 // Comment Routes
 routes.post('/comment', authenticate, commentController.post);
+routes.get('/comment', commentController.getAll);
 
 
 
