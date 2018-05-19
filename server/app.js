@@ -4,10 +4,10 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 //connect to db right here..
-import mongoose from './db/mongoose';
+import mongoose from './api/db/mongoose';
 
 //import routes
-import routes from './routes';
+import routes from './api/routes';
 
 const app = express();
 

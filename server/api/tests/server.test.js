@@ -2,7 +2,7 @@ import expect from 'expect';
 import request from 'supertest';
 import { ObjectID }  from 'mongodb';
 
-import  app  from './../app';
+import  app  from '../../app';
 import db from './../models';
 
 import { users, poems, populatePoems , populateUsers} from './seed/seed';
@@ -29,7 +29,7 @@ describe('POST /api/poems', () => {
       .expect(200)
       .expect((res) => {
         expect(res.body.success).toBe(true);        
-        expect(res.body.data.title).toBe(title);
+        expect(res.body.poem.title).toBe(title);
       })
       .end((err) => {
         if (err) {
@@ -71,7 +71,7 @@ describe('GET /api/poems', () => {
       .get('/api/poems')
       .expect(200)
       .expect((res) => {
-        expect(res.body.data.length).toBe(2);
+        expect(res.body.poems.length).toBe(2);
       })
       .end(done);
   })
@@ -83,7 +83,7 @@ describe('GET /api/poems/:id', () => {
       .get(`/api/poems/${poems[0]._id.toHexString()}`)     
       .expect(200)
       .expect((res) => {
-        expect(res.body.data.title).toBe(poems[0].title)
+        expect(res.body.poem.title).toBe(poems[0].title)
       })
       .end(done);
   });
@@ -113,7 +113,7 @@ describe('DELETE /poems/:id', () => {
       .set('x-auth', users[1].tokens[0].token)            
       .expect(200)
       .expect((res) => {
-        expect(res.body.data._id).toBe(hexId)
+        expect(res.body.poem._id).toBe(hexId)
       })
       .end((err, res) => {
         if(err){
