@@ -31,8 +31,10 @@ routes.patch('/poems/:poemId', authenticate, poemController.patch);
 routes.delete('/poems/:poemId', authenticate, poemController.delete);
 
 // Comment Routes
-routes.post('/comment', authenticate, commentController.post);
-routes.get('/comment', commentController.getAll);
+routes.post('/comments', authenticate, commentController.post);
+routes.get('/comments', commentController.getAll);
+routes.get('/comments/:commentId', commentController.getOne);
+
 
 
 

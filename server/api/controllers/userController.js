@@ -12,10 +12,19 @@ userController.post = async (req, res) => {
     const newUser = await user.save();
     const token = await user.generateAuthToken();
     
-    res.header('x-auth', token).status(200).json({
+    const response = {
       success: true,
-      data: newUser
-    });
+      user: {
+        ...newUser.toObject(),
+        request: {
+          type: 'GET',
+          description: 'GET user using url',
+          url: `http://localhost:3000/api/users/me`
+        }
+      }
+    }
+
+    res.header('x-auth', token).status(200).json(response);
   } catch(err){
     res.status(400).json({
       message: err.message
@@ -24,10 +33,20 @@ userController.post = async (req, res) => {
 }
 
 userController.get = (req, res) => {
-  res.status(200).json({
+  const response = {
     success: true,
-    data: req.user
-  });
+    user: {
+      ...req.user.toObject(),
+      request: {
+        type: 'POST',
+        description: 'POST user using url',
+        url: 'http://localhost:3000/api/users',
+        data: { username: 'String', email: 'String', password: 'ObjectID'}        
+      }
+    }
+  }
+
+  res.status(200).json(response);
 };
 
 userController.login = async (req, res) => {
@@ -36,10 +55,20 @@ userController.login = async (req, res) => {
     const user = await db.User.findByCredentials(email, password);
     const token = await user.generateAuthToken();
 
-    res.header('x-auth', token).json({
+    const response = {
       success: true,
-      data: user
-    });
+      user: {
+        ...user.toObject(),
+        request: {
+          type: 'POST',
+          description: 'POST user using url',
+          url: 'http://localhost:3000/api/users',
+          data: { username: 'String', email: 'String', password: 'ObjectID'}        
+        }
+      }
+    }
+  
+    res.header('x-auth', token).json(response);
   } catch(err){
     res.status(400).json({
       message: err.message
@@ -50,10 +79,21 @@ userController.login = async (req, res) => {
 userController.delete = async (req, res) => {
   try{
     const user = await req.user.removeToken(req.token);
-    res.status(200).json({
+
+    const response = {
       success: true,
-      data: user
-    });
+      user: {
+        user,
+        request: {
+          type: 'POST',
+          description: 'POST user using url',
+          url: 'http://localhost:3000/api/users',
+          data: { username: 'String', email: 'String', password: 'ObjectID'}        
+        }
+      }
+    }
+  
+    res.status(200).json(response);
   } catch(err){
     res.status(400).json({
       message: err.message

@@ -30,6 +30,7 @@ describe('POST /api/poems', () => {
       .expect((res) => {
         expect(res.body.success).toBe(true);        
         expect(res.body.poem.title).toBe(title);
+        expect(res.body.poem.message).toBe(message);        
       })
       .end((err) => {
         if (err) {
@@ -40,6 +41,7 @@ describe('POST /api/poems', () => {
         }).then((poems) => {
           expect(poems.length).toBe(1);
           expect(poems[0].title).toBe(title);
+          expect(poems[0].message).toBe(message);         
           done();
         }).catch((e) => done(e));
       })
@@ -83,13 +85,14 @@ describe('GET /api/poems/:id', () => {
       .get(`/api/poems/${poems[0]._id.toHexString()}`)     
       .expect(200)
       .expect((res) => {
-        expect(res.body.poem.title).toBe(poems[0].title)
+        expect(res.body.poem.title).toBe(poems[0].title);
+        expect(res.body.poem._creator.username).toBe(users[0].username);        
       })
       .end(done);
   });
 
   it('should return 404 if poem not found', (done) => {
-    var hexId = new ObjectID()
+    var hexId = new ObjectID();
     request(app)
       .get(`/api/poems/${hexId.toHexString()}`)     
       .expect(404)
@@ -106,7 +109,7 @@ describe('GET /api/poems/:id', () => {
 });
 
 describe('DELETE /poems/:id', () => {
-  it('should remove a poem token', (done) => {
+  it('should remove a poem', (done) => {
     var hexId = poems[1]._id.toHexString()
     request(app)
       .delete(`/api/poems/${hexId}`)

@@ -5,6 +5,11 @@ import db from '../../models';
 // seed data...
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
+const poemOneId = new ObjectID();
+const poemTwoId = new ObjectID();
+const commentOneId = new ObjectID();
+const commentTwoId = new ObjectID();
+
 
 const users = [{
   _id: userOneId,
@@ -27,16 +32,29 @@ const users = [{
 }];
 
 const poems = [{
-  _id: new ObjectID(),
+  _id: poemOneId,
   title: 'First test poem',
   message: "Message for first poem",
   _creator: userOneId
 }, {
-  _id: new ObjectID(),
+  _id: poemTwoId,
   title: 'Second test poem',
   message: "Message for first poem",
   _creator: userTwoId
 }];
+
+const comments = [{
+  _id: commentOneId,
+  message: "Comment for first poem",
+  _creator: userOneId,
+  _poem: poemOneId 
+}, {
+  _id: commentTwoId,
+  message: "Comment for first poem",
+  _creator: userTwoId,
+  _poem: poemTwoId,
+  _parentId: commentTwoId
+}]
 
 
 const populatePoems = () => {
@@ -45,13 +63,16 @@ const populatePoems = () => {
   })
 };
 
-const populateUsers = () => {
-  return db.User.remove({}).then(() => {
-    var userOne = new db.User(users[0]).save();
-    var userTwo = new db.User(users[1]).save();
+const populateUsers = async () => {
+  await db.User.remove({});
+  const userOne = await new db.User(users[0]).save();
+  const userTwo = await new db.User(users[1]).save();
+  // return db.User.remove({}).then(() => {
+  //   const userOne = new db.User(users[0]).save();
+  //   const userTwo = new db.User(users[1]).save();
 
-    return Promise.all([userOne, userTwo])
-  })
+  //   return Promise.all([userOne, userTwo]);
+  // })
 }
 
 export {

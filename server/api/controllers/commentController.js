@@ -1,4 +1,6 @@
 import db from './../models';
+import { ObjectID } from 'mongodb';
+
 
 const commentController = {};
 
@@ -69,39 +71,6 @@ commentController.post = async (req, res) => {
       message: err.message
     });
   }
-  // comment.save().then((newComment) => {
-  //   if(!newComment){
-  //     res.status(500).json({
-  //       message: "cannot create comment"
-  //     });
-  //   }
-  //   else{
-  //     if(newComment._parentId){
-  //       db.Comment.findOneAndUpdate({_id: _parentId})
-  //       .then((existingComment) => {
-  //         res.status(200).json({
-  //           success: true,
-  //           data: newComment,
-  //           existingComment 
-  //         })
-  //       })
-  //     }
-  //     db.Poem.findByIdAndUpdate({ _id: poemId}, {
-  //       $push : { '_comments' : newComment.id }
-  //     }).then((existingPoem) => {
-  //       res.status(200).json({
-  //         success: true,
-  //         data: newComment,
-  //         existingPoem
-  //       })
-  //     })
-  //   }
-  // }).catch((err) => {
-  //   res.status(400).json({
-  //     message: err.message
-  //   });
-  // });
-
 }
 
 commentController.getAll = (req, res) => {
@@ -118,32 +87,31 @@ commentController.getAll = (req, res) => {
   });
 }
 
-// commentController.getOne = (req, res) => {
-//   var id = req.params.poemId;
-//   if(!ObjectID.isValid(id)){
-//     return res.status(404).json({
-//       message: "no such poem"
-//     })
-//   }
-//   db.Poem.findOne({ _id: id}).populate({
-//     path: '_creator',
-//     select: 'username -_id'
-//   }).then((poem) => {
-//     if(!poem){
-//       return res.status(404).json({
-//         message: "can't find poem"
-//       })
-//     }
-//     res.status(200).json({
-//       success: true,
-//       data: poem
-//     });
-//   }).catch((err) => {
-//     res.status(400).json({
-//       message: err.message
-//     })
-//   });
-// }
+commentController.getOne = (req, res) => {
+  var id = req.params.commentId;
+  if(!ObjectID.isValid(id)){
+    return res.status(404).json({
+      message: "no such comment"
+    })
+  }
+  db.Comment.findOne({ _id: id})
+  .then((comment) => {
+    if(!comment){
+      return res.status(404).json({
+        message: "can't find comment"
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      data: comment
+    });
+  }).catch((err) => {
+    res.status(400).json({
+      message: err.message
+    })
+  });
+}
 
 // commentController.patch = async (req, res) => {
 //   let id = req.params.poemId;
