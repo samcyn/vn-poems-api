@@ -63,6 +63,13 @@ const populatePoems = () => {
   })
 };
 
+
+const populateComments = () => {
+  return db.Comment.remove({}).then(() => {
+    return db.Comment.insertMany(comments);
+  })
+};
+
 const populateUsers = async () => {
   await db.User.remove({});
   const userOne = await new db.User(users[0]).save();
@@ -76,5 +83,5 @@ const populateUsers = async () => {
 }
 
 export {
-  poems, populatePoems, users, populateUsers
+  poems, populatePoems, users, populateUsers, populateComments, comments
 }

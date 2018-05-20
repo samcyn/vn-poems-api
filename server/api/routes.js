@@ -28,10 +28,14 @@ routes.post('/poems', authenticate, poemController.post);
 routes.get('/poems', poemController.getAll);
 routes.get('/poems/:poemId', poemController.getOne);
 routes.patch('/poems/:poemId', authenticate, poemController.patch);
+routes.put('/poems/:poemId/upvote', authenticate, poemController.put);
+routes.put('/poems/:poemId/downvote', authenticate, poemController.putDownVote);
 routes.delete('/poems/:poemId', authenticate, poemController.delete);
 
 // Comment Routes
-routes.post('/comments', authenticate, commentController.post);
+routes.post('/poems/:poemId/comments', authenticate, commentController.post);
+routes.post('/poems/:poemId/comments/:commentId', authenticate, commentController.postComment);
+
 routes.get('/comments', commentController.getAll);
 routes.get('/comments/:commentId', commentController.getOne);
 

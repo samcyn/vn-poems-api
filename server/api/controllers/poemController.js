@@ -40,10 +40,7 @@ poemController.post = (req, res) => {
 poemController.getAll = (req, res) => {
   db.Poem.find({})
   .select('_id title message _comments isDeleted updatedAt createdAt')
-  .populate({
-    path: '_creator',
-    select: 'username -_id'
-  }).then((poems) => {
+  .then((poems) => {
     const response = {
       success: true,
       count: poems.length,
@@ -74,16 +71,9 @@ poemController.getOne = async (req, res) => {
       message: "no such poem"
     })
   }
-  try{
-    const poem = await db.Poem.findOne({ _id: id})
-    .populate({
-      path: '_creator',
-      select: 'username -_id' 
-    }).populate({
-      path: '_comments',
-      select: 'message _creator _poem _comments createdAt',
-      match: { 'isDeleted' : false }
-    });
+  try{ 
+    const poem = await db.Poem.findOne({ _id: id});
+    //deepPopulate('_comments _creator _comments._comments _comments._creator');
 
     if(!poem){
       return res.status(404).json({
@@ -153,6 +143,129 @@ poemController.patch = async (req, res) => {
     })
   }
   
+}
+
+poemController.put = async(req, res) => {
+  let poemId = req.params.poemId;
+
+  const userId = req.user._id;
+
+  if(!ObjectID.isValid(poemId)){
+    return res.status(404).json({
+      message: "No such poem"
+    })
+  }
+  
+  try{
+    const poem = await db.Poem.findOne({ 
+      _id: poemId,
+      _creator: userId
+    });
+    
+    if(!poem){
+      res.status(404).json({
+        message: "Poem not found"
+      }) 
+    }
+    
+    if(poem.upVotes.indexOf(userId) === -1){
+      poem.voteScore += 1;
+      poem.upVotes.push(userId);
+      poem.downVotes.splice(poem.downVotes.indexOf(userId), 1);      
+      const updatedPoem = await poem.save();
+  
+      if(!updatedPoem){
+        res.status(401).json({ message : "can't add vote"});
+      }
+  
+      const response = {
+        success: true,
+        poem: {
+          ...poem.toObject(),
+          request: {
+            type: 'GET',
+            description: 'GET poem detail using url',
+            url: 'http://localhost:3000/api/poems' + poemId
+          }
+        }
+      }
+      res.status(200).json(response);
+    }
+    else{
+      res.status(401).json({
+        message: "You can't vote twice"
+      });
+    }
+  } catch (err){
+    res.status(400).json({
+      message: err.message
+    })
+  }
+}
+
+
+poemController.putDownVote = async(req, res) => {
+  let poemId = req.params.poemId;
+
+  const userId = req.user._id;
+
+  if(!ObjectID.isValid(poemId)){
+    return res.status(404).json({
+      message: "No such poem"
+    })
+  }
+  
+  try{
+    const poem = await db.Poem.findOne({ 
+      _id: poemId,
+      _creator: userId
+    });
+    
+    if(!poem){
+      res.status(404).json({
+        message: "Poem not found"
+      }) 
+    }
+    
+    if(poem.downVotes.indexOf(userId) === -1){
+      
+      if(poem.voteScore === 0){
+        poem.voteScore = 0;
+      }
+      else{
+        poem.voteScore -= 1;
+      }
+      poem.downVotes.push(userId);
+      poem.upVotes.splice(poem.upVotes.indexOf(userId), 1);
+      const updatedPoem = await poem.save();
+  
+      if(!updatedPoem){
+        res.status(401).json({ message : "can't add vote"});
+      }
+  
+      const response = {
+        success: true,
+        poem: {
+          ...updatedPoem.toObject(),
+          request: {
+            type: 'GET',
+            description: 'GET poem detail using url',
+            url: 'http://localhost:3000/api/poems' + poemId
+          }
+        }
+      }
+      res.status(200).json(response);
+    }
+    else{
+      res.status(401).json({
+        message: "You can't downvote twice"
+      });
+    }
+  } catch (err){
+    res.status(400).json({
+      message: err.message
+    })
+  }
 }
 
 poemController.delete = (req, res) => {
