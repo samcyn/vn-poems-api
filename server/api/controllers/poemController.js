@@ -38,7 +38,7 @@ poemController.post = (req, res) => {
 }
 
 poemController.getAll = (req, res) => {
-  db.Poem.find({})
+  db.Poem.find({ isDeleted: false})
   .select('_id title message _comments isDeleted updatedAt createdAt')
   .then((poems) => {
     const response = {
@@ -72,12 +72,12 @@ poemController.getOne = async (req, res) => {
     })
   }
   try{ 
-    const poem = await db.Poem.findOne({ _id: id});
+    const poem = await db.Poem.findOne({ _id: id, isDeleted: false });
     //deepPopulate('_comments _creator _comments._comments _comments._creator');
 
     if(!poem){
       return res.status(404).json({
-        message: "can't find poem"
+        message: "poem not found"
       })
     }
     const response = {
@@ -158,8 +158,7 @@ poemController.put = async(req, res) => {
   
   try{
     const poem = await db.Poem.findOne({ 
-      _id: poemId,
-      _creator: userId
+      _id: poemId
     });
     
     if(!poem){
@@ -181,7 +180,7 @@ poemController.put = async(req, res) => {
       const response = {
         success: true,
         poem: {
-          ...poem.toObject(),
+          ...updatedPoem.toObject(),
           request: {
             type: 'GET',
             description: 'GET poem detail using url',
@@ -217,8 +216,7 @@ poemController.putDownVote = async(req, res) => {
   
   try{
     const poem = await db.Poem.findOne({ 
-      _id: poemId,
-      _creator: userId
+      _id: poemId
     });
     
     if(!poem){
@@ -277,10 +275,10 @@ poemController.delete = (req, res) => {
       message: "Invalid poem id"
     })
   }
-  db.Poem.findOneAndRemove({
+  db.Poem.findOneAndUpdate({
     _id: id,
     _creator: userId
-  }).then((poem) => {
+  }, { $set: { isDeleted: true }}).then((poem) => {
     if(!poem){
       return res.status(404).json({
         message: "No such poem"
@@ -292,8 +290,9 @@ poemController.delete = (req, res) => {
         ...poem.toObject(),
         request: {
           type: 'POST',
+          description: 'You can create new poem with url',
           url: 'http://localhost:3000/api/poems',
-          data: { title: 'String', message: 'String', _creator: 'ObjectID'}
+          data: { title: 'String', message: 'String', _creator: 'String'}
         }
       }
     }

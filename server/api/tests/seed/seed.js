@@ -5,6 +5,7 @@ import db from '../../models';
 // seed data...
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
+const userThreeId = new ObjectID();
 const poemOneId = new ObjectID();
 const poemTwoId = new ObjectID();
 const commentOneId = new ObjectID();
@@ -28,6 +29,16 @@ const users = [{
   tokens: [{
     access: 'auth',
     token: jwt.sign({_id: userTwoId, access: 'auth'}, process.env.JWT_SECRET).toString()
+  }]
+}, {
+  _id: userThreeId,
+  username: "dele",
+  email: 'dele@example.com',
+  password: 'userThreePass',
+  loginAttempts: 4,
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({_id: userThreeId, access: 'auth'}, process.env.JWT_SECRET).toString()
   }]
 }];
 
@@ -74,12 +85,7 @@ const populateUsers = async () => {
   await db.User.remove({});
   const userOne = await new db.User(users[0]).save();
   const userTwo = await new db.User(users[1]).save();
-  // return db.User.remove({}).then(() => {
-  //   const userOne = new db.User(users[0]).save();
-  //   const userTwo = new db.User(users[1]).save();
-
-  //   return Promise.all([userOne, userTwo]);
-  // })
+  const userThree = await new db.User(users[2]).save();
 }
 
 export {

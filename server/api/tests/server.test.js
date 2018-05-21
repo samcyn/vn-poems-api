@@ -127,30 +127,6 @@ describe('DELETE /api/poems/:id', () => {
   })
 });
 
-describe('GET /api/users/me', () => {
-  it('should return user if authenticated', (done) => {
-    request(app)
-      .get('/api/users/me')
-      .set('x-auth', users[0].tokens[0].token) //set header in test
-      .expect(200)
-      .expect((res) => {
-        expect(res.body.success).toBe(true);
-        expect(res.body.user._id).toBe(users[0]._id.toHexString());
-        expect(res.body.user.email).toBe(users[0].email);
-      })
-      .end(done);
-  });
-
-  it('should return 401 if not authenticated', (done) => {
-    request(app)
-      .get('/api/users/me')
-      .expect(401)
-      .end(done);
-  });
-
-});
-
-
 describe('PATCH /api/poems/:id', () => {
   it('should update the poem', (done) => {
     const hexId = poems[0]._id.toHexString();
@@ -195,7 +171,81 @@ describe('PATCH /api/poems/:id', () => {
   });
 });
 
+describe('PUT /api/poems/:poemId/upvote', () => {
+  it('should add upvote to poem', (done) => {
+    const hexId = poems[0]._id.toHexString();
+    request(app)
+      .put(`/api/poems/${hexId}/upvote`)
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.poem.voteScore).toBe(1);
+        expect(res.body.poem.upVotes.length).toBe(1);
+        expect(res.body.poem.downVotes.length).toBe(0);
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+        db.Poem.findById(hexId).then((poem) => {
+          expect(poem.voteScore).toBe(1);
+          expect(poem.upVotes).toContain(users[0]._id); //id of user added into upvotes array
+          expect(poem.downVotes.length).toBe(0);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+});
 
+
+describe('PUT /api/poems/:poemId/downvote', () => {
+  it('should add downvote to poem', (done) => {
+    const hexId = poems[0]._id.toHexString();
+    request(app)
+      .put(`/api/poems/${hexId}/downvote`)
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.poem.voteScore).toBe(0);
+        expect(res.body.poem.upVotes.length).toBe(0);
+        expect(res.body.poem.downVotes.length).toBe(1);
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+        db.Poem.findById(hexId).then((poem) => {
+          expect(poem.voteScore).toBe(0);
+          expect(poem.upVotes.length).toBe(0); 
+          expect(poem.downVotes).toContain(users[0]._id); //id of user added into upvotes array
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+});
+
+describe('GET /api/users/me', () => {
+  it('should return user if authenticated', (done) => {
+    request(app)
+      .get('/api/users/me')
+      .set('x-auth', users[0].tokens[0].token) //set header in test
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.success).toBe(true);
+        expect(res.body.user._id).toBe(users[0]._id.toHexString());
+        expect(res.body.user.email).toBe(users[0].email);
+      })
+      .end(done);
+  });
+
+  it('should return 401 if not authenticated', (done) => {
+    request(app)
+      .get('/api/users/me')
+      .expect(401)
+      .end(done);
+  });
+
+});
 
 describe('POST /api/users', () => {
   it('should create a user', (done) => {
@@ -293,10 +343,37 @@ describe('POST /api/users/login', () => {
         }
         db.User.findById(users[1]._id).then((user) => {
           //no tokens generated and added
-          expect(user.tokens.length).toBe(1)
+          expect(user.tokens.length).toBe(1);
+          expect(user.loginAttempts).toBe(1); // login attempt increase to 1
           done();
         }).catch((e) => done(e));
       });
+  });
+  
+  it('should lock account on fifth fail login attempt', (done) => {
+     // invalid password for instance
+     request(app)
+     .post('/api/users/login')
+     .send({
+       email: users[2].email,
+       password: "invalid-password"
+     })
+     .expect(400)
+     .expect((res) => {
+       expect(res.headers['x-auth']).toBeFalsy();
+     })
+     .end((err, res) => {
+       if(err){
+         return done(err);
+       }
+       db.User.findById(users[2]._id).then((user) => {
+         //no tokens generated and added
+         expect(user.tokens.length).toBe(1);
+         expect(user.loginAttempts).toBe(5); // login attempt increase by 1
+         expect(user.isLocked).toBe(true);
+         done();
+       }).catch((e) => done(e));
+     });
   });
 });
 
@@ -354,6 +431,26 @@ describe('POST /api/poems/:poemId/comments', () => {
         }).catch((e) => done(e));
       })
   });
+
+  it('should not add a new comment if no token/authentication', (done) => {
+    const message = "Added comment to poem one"; 
+    //comment added to poem in this case
+    const poemId = poems[0]._id; 
+    request(app)
+    .post(`/api/poems/${poemId}/comments`)
+    .send({message}) 
+    .expect(401)
+    .end((err, res) => {
+      if(err){
+       return done(err);
+      }
+      db.Poem.findById(poemId).then((poem) => {
+        expect(poem._comments.length).toBe(0);
+        done();
+      }).catch((e) => done(e));
+    })   
+  });
+
   it('should add a new comment to another comment', (done) => {
     const message = "Added comment to another comment"; 
     const _parentId = comments[0]._id;
