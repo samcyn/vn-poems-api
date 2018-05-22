@@ -135,7 +135,7 @@ commentController.getOne = (req, res) => {
       message: "no such comment"
     })
   }
-  db.Comment.findOne({ _id: id})
+  db.Comment.findOne({ _id: id, isDeleted: false })
   .then((comment) => {
     if(!comment){
       return res.status(404).json({
@@ -160,6 +160,91 @@ commentController.getOne = (req, res) => {
     })
   });
 }
+
+commentController.patch = async (req, res) => {
+  let id = req.params.commentId;
+  let updates = req.body;
+
+  const userId = req.user._id;
+
+  if(!ObjectID.isValid(id)){
+    return res.status(404).json({
+      message: "No such comment"
+    })
+  }
+  
+  try{
+    updates.updatedAt = Date.now();
+    const comment = await db.Comment.findOneAndUpdate({ 
+      _id: id,
+      _creator: userId,
+      isDeleted: false
+    }, { $set: updates }, { new: true });
+    
+    if(!comment){
+      res.status(404).json({
+        message: "Comment not found"
+      }) 
+    }
+    const response = {
+      success: true,
+      comment: {
+        ...comment.toObject(),
+        request: {
+          type: 'GET',
+          description: 'GET poem using url',
+          url: 'http://localhost:3000/api/comments' + id
+        }
+      }
+    }
+    res.status(200).json(response);
+  } catch (err){
+    res.status(400).json({
+      message: err.message
+    })
+  }
+  
+}
+
+commentController.delete = (req, res) => {
+  const id = req.params.commentId;
+  const userId = req.user._id;
+
+  if(!ObjectID.isValid(id)){
+    return res.status(404).json({
+      message: "Invalid poem id"
+    })
+  }
+  db.Comment.findOneAndUpdate({
+    _id: id,
+    _creator: userId,
+    isDeleted: false
+  }, { $set: { isDeleted: true }}).then((comment) => {
+    if(!comment){
+      return res.status(404).json({
+        message: "No such comment"
+      });
+    }
+    const response  = {
+      success: true,
+      comment: {
+        ...comment.toObject(),
+        request: {
+          type: 'POST',
+          description: 'You can create new comment on a poem with url',
+          url: 'http://localhost:3000/api/poems/:poemId/comments',
+          data: { title: 'String', message: 'String', _creator: 'String'}
+        }
+      }
+    }
+    res.status(200).json(response);
+  }).catch((err) => {
+    res.status(400).json({
+      message: err.message
+    });
+  });
+}
+
 
 
 export default commentController;

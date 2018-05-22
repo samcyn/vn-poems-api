@@ -14,6 +14,10 @@ var CommentSchema = Schema({
     type: Boolean,
     default: false
   },
+  updatedAt: {
+    type: Number,
+    default: null
+  },
   _creator: {
     type: Schema.Types.ObjectId,
     ref: 'User',

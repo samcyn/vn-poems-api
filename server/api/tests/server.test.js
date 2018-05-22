@@ -109,7 +109,31 @@ describe('GET /api/poems/:id', () => {
 });
 
 describe('DELETE /api/poems/:id', () => {
-  it('should remove a poem', (done) => {
+  it('should set the isDeleted field to true', (done) => {
+    const hexId = poems[0]._id.toHexString();
+    
+    request(app)
+      .delete(`/api/poems/${hexId}`)
+      .set('x-auth', users[0].tokens[0].token)     
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.poem.isDeleted).toBe(true);       
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+        db.Poem.findOne({
+          _id: hexId
+        }).then((poem) => {
+          expect(poem.isDeleted).toBe(true);        
+          done();
+        }).catch((e) => done(e));
+      })
+
+  });
+
+  it('should not remove a poem if poemId is not found', (done) => {
     let hexId = new ObjectID();
     request(app)
       .delete(`/api/poems/${hexId.toHexString()}`)
@@ -152,7 +176,7 @@ describe('PATCH /api/poems/:id', () => {
     const message = "A new update in test";
 
     request(app)
-      .patch(`/poems/${hexId}`)
+      .patch(`/api/poems/${hexId}`)
       .set('x-auth', users[1].tokens[0].token)
       .send({title, message})
       .expect(404)
@@ -481,4 +505,90 @@ describe('POST /api/poems/:poemId/comments', () => {
         
       })
   });
-})
+});
+
+
+describe('DELETE /api/comments/:id', () => {
+  it('should set the isDeleted field to true', (done) => {
+    const hexId = comments[0]._id.toHexString();
+    
+    request(app)
+      .delete(`/api/comments/${hexId}`)
+      .set('x-auth', users[0].tokens[0].token)     
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.comment.message).toBe(comments[0].message);       
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+        db.Comment.findOne({
+          _id: hexId
+        }).then((comment) => {
+          expect(comment.isDeleted).toBe(true);        
+          done();
+        }).catch((e) => done(e));
+      })
+
+  });
+
+  it('should not remove a comment if commentId is not found', (done) => {
+    let hexId = new ObjectID();
+    request(app)
+      .delete(`/api/comments/${hexId.toHexString()}`)
+      .set('x-auth', users[1].tokens[0].token)                  
+      .expect(404)
+      .end(done);
+  });
+    
+  it('should return 404 if object id is invalid', (done) => {
+    request(app)
+      .delete('/api/comments/1234')
+      .set('x-auth', users[1].tokens[0].token)                  
+      .expect(404)
+      .end(done);
+  })
+});
+
+
+describe('PATCH /api/comments/:id', () => {
+  it('should update a particular comment', (done) => {
+    const hexId = comments[0]._id.toHexString();
+    const message = "A new update in test";
+
+    request(app)
+      .patch(`/api/comments/${hexId}`)
+      .set('x-auth', users[0].tokens[0].token)
+      .send({message})
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.comment.message).toBe(message);
+        expect(typeof(res.body.comment.updatedAt)).toBe('number');
+      })
+      .end(done);
+  });
+
+  it('should not update the comment created by other user', (done) => {
+    const hexId = comments[0]._id.toHexString();
+    const message = "A new update in test";
+
+    request(app)
+      .patch(`/api/poems/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token)
+      .send({message})
+      .expect(404)
+      .end(done);
+  });
+
+  it('should not update when user is not authenticated', (done) => {
+    const hexId = comments[1]._id.toHexString();
+    const message = "test updates !!";
+
+    request(app)
+      .patch(`/api/poems/${hexId}`)     
+      .send({message})
+      .expect(401)
+      .end(done);
+  });
+});

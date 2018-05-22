@@ -38,7 +38,7 @@ poemController.post = (req, res) => {
 }
 
 poemController.getAll = (req, res) => {
-  db.Poem.find({ isDeleted: false})
+  db.Poem.find({isDeleted: false})
   .select('_id title message _comments isDeleted updatedAt createdAt')
   .then((poems) => {
     const response = {

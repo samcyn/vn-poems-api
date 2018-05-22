@@ -35,9 +35,11 @@ routes.delete('/poems/:poemId', authenticate, poemController.delete);
 // Comment Routes
 routes.post('/poems/:poemId/comments', authenticate, commentController.post);
 routes.post('/poems/:poemId/comments/:commentId', authenticate, commentController.postComment);
-
 routes.get('/comments', commentController.getAll);
 routes.get('/comments/:commentId', commentController.getOne);
+routes.patch('/comments/:commentId', authenticate, commentController.patch);
+routes.delete('/comments/:commentId', authenticate, commentController.delete);
+
 
 
 
