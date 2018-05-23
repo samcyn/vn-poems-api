@@ -277,7 +277,8 @@ poemController.delete = (req, res) => {
   }
   db.Poem.findOneAndUpdate({
     _id: id,
-    _creator: userId
+    _creator: userId,
+    isDeleted: false
   }, { $set: { isDeleted: true }}).then((poem) => {
     if(!poem){
       return res.status(404).json({
