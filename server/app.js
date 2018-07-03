@@ -2,7 +2,8 @@ import './config/config';
 
 import express from 'express';
 import bodyParser from 'body-parser';
-
+import cors from 'cors';
+import morgan  from 'morgan'
 //connect to db right here..
 import mongoose from './api/db/mongoose';
 
@@ -13,6 +14,8 @@ const app = express();
 
 //Middleware right here...
 app.use(bodyParser.json());
+app.use(cors());
+app.use(morgan('combined'));
 app.use('/api', routes);
 
 //GLOBAL ERROR HANDLER

@@ -9,6 +9,8 @@ import userController from './controllers/userController';
 import poemController from './controllers/poemController';
 import commentController from './controllers/commentController';
 
+//POLICIES
+import userControllerPolicy from './policies/userControllerPolicy';
 
 
 const routes = express();
@@ -17,7 +19,7 @@ const routes = express();
 routes.get('/', basicController.get);
 
 // User routes..
-routes.post('/users', userController.post);
+routes.post('/users',  userControllerPolicy.post, userController.post);
 routes.get('/users/me', authenticate , userController.get);
 routes.post('/users/login', userController.login);
 routes.delete('/users/me/token', authenticate, userController.delete);
