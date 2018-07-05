@@ -39,7 +39,8 @@ poemController.post = (req, res) => {
 
 poemController.getAll = (req, res) => {
   db.Poem.find({isDeleted: false})
-  .select('_id title message _comments isDeleted updatedAt createdAt')
+  .select('_id title message _creator _comments isDeleted updatedAt createdAt')
+  .populate({ path: '_creator', select: 'username -_id'})
   .then((poems) => {
     const response = {
       success: true,

@@ -1,22 +1,41 @@
 <template>
   <div id="app">
-    <router-view/>
+    <Navigation/>
+
+    <main>
+      <router-view/>
+    </main>
+
+    <Foot/>
   </div>
 </template>
 
 <script>
-export default {
-  name: 'App'
-}
+  import Navigation from '@/components/Navigation';
+  import Foot from '@/components/Foot';
+
+  export default {
+    name: 'App',
+    components: {
+      Navigation,
+      Foot
+    }
+  }
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  body {
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 168px;
+  }
+  .container {
+    padding: 0 12px;
+  }
+  
+  section {
+    padding: 60px 0;
+  }
+  
 </style>
+
