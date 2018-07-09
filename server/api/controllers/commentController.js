@@ -4,6 +4,100 @@ import { ObjectID } from 'mongodb';
 
 const commentController = {};
 
+commentController.postAll = async (req, res) => {
+
+  const { message, poemId, commentId } = req.body;
+  const userId = req.user._id;
+  
+  if (!commentId && poemId) {
+    
+    var comment = new db.Comment({
+      message,
+      _creator: userId,
+      _poem: poemId
+    });
+
+    try{
+      const newComment = await comment.save();
+      // if no newComment..
+      if(!newComment){
+        return res.status(500).json({
+          message: "cannot create comment"
+        });
+      }
+    
+      //push this comment to an existing poem......
+      const existingPoem = await db.Poem.findByIdAndUpdate({ _id: poemId }, {
+        $push : { '_comments' : newComment.id }
+      });
+      const response = {
+        success: true,
+        comment: {
+          ...newComment.toObject(),
+          request: {
+            type: 'GET',
+            description: 'GET comment using url',
+            url: `http://localhost:3000/api/comments/${newComment._id}`
+          }
+        }
+      }
+      if(existingPoem){
+        return res.status(200).json(response);
+      }
+    }
+    catch(err){
+      res.status(400).json({
+        message: err.message
+      });
+    }
+  }
+  else if(commentId && poemId) {
+
+    var comment = new db.Comment({
+      message,
+      _creator: userId,
+      _poem: poemId,
+      _parentId: commentId
+    });
+  
+    try{
+      const newComment = await comment.save();
+      // if no newComment..
+      if(!newComment){
+        return res.status(500).json({
+          message: "cannot create comment"
+        });
+      }
+     
+      //push this comment to an existing comment......
+      const existingComment = await db.Comment.findByIdAndUpdate({ _id: commentId }, {
+        $push : { '_comments' : newComment.id }
+      });
+      const response = {
+        success: true,
+        comment: {
+          ...newComment.toObject(),
+          request: {
+            type: 'GET',
+            description: 'GET comment using url',
+            url: `http://localhost:3000/api/comments/${newComment._id}`
+          }
+        }
+      }
+      if(existingComment){
+        return res.status(200).json(response);
+      }
+    }
+    catch(err){
+      res.status(400).json({
+        message: err.message
+      });
+    }
+
+  }
+
+}
+
 commentController.post = async (req, res) => {
   const { message } = req.body;
   const userId = req.user._id;
@@ -75,7 +169,7 @@ commentController.postComment = async (req, res) => {
       });
     }
    
-    //push this comment to an existing poem......
+    //push this comment to an existing comment......
     const existingComment = await db.Comment.findByIdAndUpdate({ _id: _parentId }, {
       $push : { '_comments' : newComment.id }
     });

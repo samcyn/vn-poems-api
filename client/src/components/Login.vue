@@ -50,7 +50,7 @@ export default {
       cardDetails: {
         title: 'Login',
         cardWidth: '400px',
-        iconName: 'fa fa-lock'
+        iconName: 'icon-lock'
       },
       email: '',
       password: '',

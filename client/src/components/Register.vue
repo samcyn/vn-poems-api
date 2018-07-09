@@ -59,7 +59,7 @@ export default {
       cardDetails: {
         title: 'Register',
         cardWidth: '400px',
-        iconName: 'fa fa-lock'
+        iconName: 'icon-lock'
       },
       username:'',
       email: '',

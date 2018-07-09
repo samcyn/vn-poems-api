@@ -15,14 +15,16 @@
 
       <div id="navbarExampleTransparentExample" class="navbar-menu">
         <div class="navbar-start">
-          <router-link :to="{ name: 'home' }" class="navbar-item" v-if="!$store.state.isUserLoggedIn">Home</router-link>          
+          <router-link :to="{ name: 'home' }" class="navbar-item">Home</router-link>
+          <router-link :to="{ name: 'account' }" class="navbar-item" v-if="isUserLoggedIn">Account</router-link>          
+          <router-link :to="{ name: 'addPoem' }" class="navbar-item" v-if="isUserLoggedIn">Add Doc</router-link>
         </div>
 
         <div class="navbar-end">
-          <router-link :to="{ name: 'login' }" class="navbar-item" v-if="!$store.state.isUserLoggedIn">Sign In</router-link>
-          <router-link :to="{ name: 'register' }" class="navbar-item" v-if="!$store.state.isUserLoggedIn">Sign Up</router-link>
+          <router-link :to="{ name: 'login' }" class="navbar-item" v-if="!isUserLoggedIn">Sign In</router-link>
+          <router-link :to="{ name: 'register' }" class="navbar-item" v-if="!isUserLoggedIn">Sign Up</router-link>
 
-          <div class="navbar-item" v-if="$store.state.isUserLoggedIn">
+          <div class="navbar-item" v-if="isUserLoggedIn">
             <div class="field is-grouped">
               <p class="control">
                 <button class="button is-primary" href="#" v-on:click="logOut">
@@ -41,6 +43,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import AuthenticationService from '@/services/AuthenticationService';
 
 export default {
@@ -53,7 +56,8 @@ export default {
     async logOut () {
       try {
         //authentication needed here...
-        const response = await AuthenticationService.logOut();
+        const token = this.$store.state.token;
+        const response = await AuthenticationService.logOut(token);
         this.$store.dispatch('setToken', null);
         this.$store.dispatch('setUser', null);
         //TODO redirect to home page
@@ -64,6 +68,11 @@ export default {
         console.log(e);
       }
     }
+  },
+  computed : {
+    ...mapState([
+      'isUserLoggedIn'
+    ])
   }
 }
 </script>

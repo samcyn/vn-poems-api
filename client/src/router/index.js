@@ -5,7 +5,8 @@ import Register from '@/components/Register'
 import Login from '@/components/Login'
 import Poems from '@/components/poems/Poems'
 import Poem from '@/components/poems/Poem'
-
+import AddPoem from '@/components/poems/AddPoem'
+import Account from '@/components/user/Account';
 
 Vue.use(Router)
 
@@ -28,6 +29,11 @@ export default new Router({
       component: Login
     },
     {
+      path: '/account',
+      name: 'account',
+      component: Account
+    },
+    {
       path: '/poems',
       name: 'poems',
       component: Poems
@@ -46,7 +52,12 @@ export default new Router({
       path: '/documents/:docId',
       name: 'document',
       component: Poem
-    }
+    },
+    {
+      path: '/docs/add',
+      name: 'addPoem',
+      component: AddPoem
+    },
   ],
   linkExactActiveClass: "is-active"
 })

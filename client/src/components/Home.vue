@@ -39,25 +39,25 @@
         <div class="level-item has-text-centered">
           <div>
             <p class="heading has-text-white">Documents</p>
-            <p class="title has-text-white">3346</p>
+            <p class="title has-text-white">NA</p>
           </div>
         </div>
         <div class="level-item has-text-centered">
           <div>
             <p class="heading has-text-white">Collections</p>
-            <p class="title has-text-white">3346</p>
+            <p class="title has-text-white">NA</p>
           </div>
         </div>
         <div class="level-item has-text-centered">
           <div>
             <p class="heading has-text-white">Poems</p>
-            <p class="title has-text-white">3346</p>
+            <p class="title has-text-white">{{ totalPoem }}</p>
           </div>
         </div>
         <div class="level-item has-text-centered">
           <div>
             <p class="heading has-text-white">Users</p>
-            <p class="title has-text-white">3346</p>
+            <p class="title has-text-white">6</p>
           </div>
         </div>
       </nav>
@@ -101,6 +101,7 @@ export default {
   data () {
     return {
       poems: null,
+      totalPoem: 0,
       loadingPoems: false
     }
   },
@@ -108,7 +109,8 @@ export default {
     this.loadingPoems = true;
     try {
       const response = await PoemsService.getAll();
-      this.poems = response.data.poems;
+      this.poems = response.data.poems.slice(0,3);
+      this.totalPoem = response.data.poems.length;
       this.loadingPoems = false;
     } catch(err) {
       console.log('ERROR FETCHNG POEMS', err);

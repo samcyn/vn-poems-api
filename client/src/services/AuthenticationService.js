@@ -7,7 +7,9 @@ export default {
   login (credentials) {
     return Api().post('users/login', credentials);
   },
-  logOut () {
-    return Api().delete('users/me/token');
+  logOut (token) {
+    return Api().delete('users/me/token', {
+      headers: { 'x-auth' : token }
+    });
   }
 }

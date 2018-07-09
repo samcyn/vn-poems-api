@@ -42,18 +42,17 @@ export default {
     }
   },
   created (){
-    console.log(this.docs);
   },
   computed: {
     iconValue (){
       if(this.type.toLowerCase() === 'poems') {
-        return 'fa fa-github';
+        return 'icon-book-open';
       }
       else if (this.type.toLowerCase() === 'documents') {
-        return 'fa fa-file';
+        return 'icon-doc';
       }
       else if (this.type.toLowerCase() === 'collections') {
-        return 'fa fa-users';
+        return 'icon-docs';
       }
     },
     //a reevaluated value to help with routing to poems, pome, documents and so on
