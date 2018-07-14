@@ -17,11 +17,13 @@ userControllerPolicy.post = (req, res, next) => {
     switch (error.details[0].context.key) {
       case 'email':
         res.status(400).json({
+          code: 0,
           message: 'You must provide a valid email details'
         });
         break;
       case 'password':
         res.status(400).json({
+          code: 1,
           message: ` The password provide must: <br>
             1. it must contain lower case, uppercase , numerics
             <br>
@@ -31,6 +33,7 @@ userControllerPolicy.post = (req, res, next) => {
         break;
       default:
         res.status(400).json({
+          code: 2,
           message: 'Invalid credentials supplied'
         });
     }

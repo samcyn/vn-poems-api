@@ -18,7 +18,7 @@
 
         <div class="field is-grouped">
           <div class="control">
-            <button class="button is-primary">Post Doc</button>
+            <button class="button is-primary"  v-bind:class="{'is-loading': isLoading }">Post Doc</button>
           </div>
         </div>
       </form>
@@ -38,7 +38,8 @@ export default {
   data () {
     return {
       title: '',
-      content: ''
+      content: '',
+      isLoading: false
     }
   },
   mounted(){
@@ -46,15 +47,20 @@ export default {
   },
   methods: {
     async postDoc () {
+      this.isLoading = true;
       const token = this.$store.state.token;
       try {
-         const response = await PoemsService.post({
+        const response = await PoemsService.post({
           title: this.title,
           message: this.content
         }, token);
+        this.title = '';
+        this.content = '';
+        this.isLoading = false;
       }
       catch (err) {
-        console.log(err);
+        console.log({err});
+        this.isLoading = false;
       } 
     }
   }

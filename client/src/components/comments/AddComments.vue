@@ -44,7 +44,8 @@ export default {
           commentId: this.commentId,
           message: this.message
         }, token);
-        console.log(response);
+        //RESET FORM
+        this.message = '';
       }
       catch(err){
         this.error = err.response.data.message;

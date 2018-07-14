@@ -146,11 +146,11 @@ poemController.patch = async (req, res) => {
   
 }
 
+//upvote
 poemController.put = async(req, res) => {
   let poemId = req.params.poemId;
-
   const userId = req.user._id;
-
+  console.log('votes', userId);
   if(!ObjectID.isValid(poemId)){
     return res.status(404).json({
       message: "No such poem"
@@ -203,7 +203,7 @@ poemController.put = async(req, res) => {
   }
 }
 
-
+//downvote
 poemController.putDownVote = async(req, res) => {
   let poemId = req.params.poemId;
 

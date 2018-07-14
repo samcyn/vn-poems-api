@@ -8,7 +8,7 @@ import Poem from '@/components/poems/Poem'
 import AddPoem from '@/components/poems/AddPoem'
 import Account from '@/components/user/Account';
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   mode: 'history',
@@ -21,17 +21,20 @@ export default new Router({
     {
       path: '/register',
       name: 'register',
-      component: Register
+      component: Register,
+      meta: { requiresVisitor: true }
     },
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: Login,
+      meta: { requiresVisitor: true }
     },
     {
       path: '/account',
       name: 'account',
-      component: Account
+      component: Account,
+      meta: { requiresAuth: true }
     },
     {
       path: '/poems',
@@ -56,8 +59,9 @@ export default new Router({
     {
       path: '/docs/add',
       name: 'addPoem',
-      component: AddPoem
+      component: AddPoem,
+      meta: { requiresAuth: true }
     },
   ],
   linkExactActiveClass: "is-active"
-})
+});
